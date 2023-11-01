@@ -7,6 +7,8 @@ import com.project.schoolmanagment.payload.response.abstracts.ResponseMessage;
 import com.project.schoolmanagment.payload.response.user.UserResponse;
 import com.project.schoolmanagment.service.user.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,14 +24,29 @@ public class UserController {
     @PostMapping("/save/{userRole}")
     public ResponseEntity<ResponseMessage<UserResponse>> saveUser(
             @RequestBody @Valid UserRequest userRequest,
-            @PathVariable String userRole){
-        return ResponseEntity.ok(userService.saveUser(userRequest,userRole));
+            @PathVariable String userRole) {
+        return ResponseEntity.ok(userService.saveUser(userRequest, userRole));
     }
 
 
     @GetMapping("/getUserById/{userId}")
-    public ResponseMessage<BaseUserResponse> getUserById(@PathVariable Long userId){
+    public ResponseMessage<BaseUserResponse> getUserById(@PathVariable Long userId) {
         return userService.getUserById(userId);
     }
+
+    @GetMapping("/getAllUserByPage/{userRole}")
+    public ResponseEntity<Page<UserResponse>> getPageByPage(
+            @PathVariable String userRole,
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size,
+            @RequestParam(value = "sort", defaultValue = "name") String sort,
+            @RequestParam(value = "type", defaultValue = "desc") String type
+    ) {
+        Page<UserResponse> userResponse = userService.getUsersByPage(page, size, sort, type, userRole);
+        return new ResponseEntity<>(userResponse, HttpStatus.OK);
+
+    }
+
+
 
 }
