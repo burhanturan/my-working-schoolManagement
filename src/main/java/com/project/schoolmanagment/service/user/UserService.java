@@ -7,19 +7,25 @@ import com.project.schoolmanagment.payload.mappers.UserMapper;
 import com.project.schoolmanagment.payload.messages.ErrorMessages;
 import com.project.schoolmanagment.payload.messages.SuccessMessages;
 import com.project.schoolmanagment.payload.request.user.UserRequest;
+import com.project.schoolmanagment.payload.request.user.UserRequestWithoutPassword;
 import com.project.schoolmanagment.payload.response.abstracts.BaseUserResponse;
 import com.project.schoolmanagment.payload.response.abstracts.ResponseMessage;
 import com.project.schoolmanagment.payload.response.user.UserResponse;
 import com.project.schoolmanagment.repository.user.UserRepository;
+import com.project.schoolmanagment.service.helper.MethodHelper;
 import com.project.schoolmanagment.service.helper.PageableHelper;
 import com.project.schoolmanagment.service.validator.UniquePropertyValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -30,6 +36,7 @@ public class UserService {
     private final UserMapper userMapper;
     private final UserRoleService userRoleService;
     private final PageableHelper pageableHelper;
+    private final MethodHelper methodHelper;
 
     public ResponseMessage<UserResponse> saveUser(UserRequest userRequest, String userRole) {
         //handle uniqueness exceptions
@@ -97,5 +104,42 @@ public class UserService {
                 .map(userMapper::mapUserToUserResponse);
 
 
+    }
+
+    public List<UserResponse> getUserByName(String userName) {
+        return userRepository.getUserByNameContaining(userName)
+                .stream().map(userMapper::mapUserToUserResponse)
+                .collect(Collectors.toList());
+    }
+
+    //Normally we should return string not response entity.
+    //Response entity should be int controller layer.
+    public ResponseEntity<String> updateUserForUsers(UserRequestWithoutPassword userRequestWithoutPassword, HttpServletRequest request) {
+        String userName = (String) request.getAttribute("username");
+
+        User user = userRepository.findByUsername(userName);
+
+        //We need to check if the user can be change ??
+        methodHelper.isUserBuiltIn(user);
+
+        //we need to check if we are changing unique properties ??
+
+        uniquePropertyValidator.checkUniqueProperties(user, userRequestWithoutPassword);
+
+        //implementations without using mapping builders
+        user.setUsername(userRequestWithoutPassword.getUsername());
+        user.setBirthDay(userRequestWithoutPassword.getBirthDay());
+        user.setEmail(userRequestWithoutPassword.getEmail());
+        user.setPhoneNumber(userRequestWithoutPassword.getPhoneNumber());
+        user.setBirthPlace(userRequestWithoutPassword.getBirthPlace());
+        user.setGender(userRequestWithoutPassword.getGender());
+        user.setName(userRequestWithoutPassword.getName());
+        user.setSurname(userRequestWithoutPassword.getSurname());
+        user.setSsn(userRequestWithoutPassword.getSsn());
+        userRepository.save(user);
+
+        String message = SuccessMessages.USER_UPDATE;
+
+        return new ResponseEntity<>(message, HttpStatus.OK);
     }
 }
