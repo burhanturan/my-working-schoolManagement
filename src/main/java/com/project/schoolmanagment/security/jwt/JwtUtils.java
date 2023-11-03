@@ -23,17 +23,16 @@ public class JwtUtils {
     @Value("${backendapi.app.jwtSecret}")
     private String jwtSecret;
 
-    public String generateJwtToken(Authentication authentication){
+    public String generateJwtToken(Authentication authentication) {
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
         return generateTokenFromUsername(userDetails.getUsername());
     }
 
     /**
-     *
      * @param jwtToken token to validate
      * @return true of JWT is correct otherwise will return FALSE.
      */
-    public boolean validateJwt(String jwtToken){
+    public boolean validateJwt(String jwtToken) {
         try {
             Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(jwtToken);
             return true;
@@ -61,7 +60,7 @@ public class JwtUtils {
                 .setSubject(username)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(new Date().getTime() + jwtExpirations))
-                .signWith(SignatureAlgorithm.ES256, jwtSecret)
+                .signWith(SignatureAlgorithm.HS512, jwtSecret)
                 .compact();
     }
 

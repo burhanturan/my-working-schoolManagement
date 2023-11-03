@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -25,6 +26,7 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping("/save/{userRole}")
+    //@PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<ResponseMessage<UserResponse>> saveUser(
             @RequestBody @Valid UserRequest userRequest,
             @PathVariable String userRole) {
@@ -33,11 +35,13 @@ public class UserController {
 
 
     @GetMapping("/getUserById/{userId}")
+    //@PreAuthorize("hasAuthority('ADMIN','MANAGER')")
     public ResponseMessage<BaseUserResponse> getUserById(@PathVariable Long userId) {
         return userService.getUserById(userId);
     }
 
     @GetMapping("/getAllUserByPage/{userRole}")
+   // @PreAuthorize("hasAnyAuthority('ADMIN')")
     public ResponseEntity<Page<UserResponse>> getPageByPage(
             @PathVariable String userRole,
             @RequestParam(value = "page", defaultValue = "0") int page,
@@ -51,11 +55,13 @@ public class UserController {
     }
 
     @GetMapping("/getUserByName")
+   // @PreAuthorize("hasAuthority('ADMIN','MANAGER','ASSISTANT_MANAGER')")
     public List<UserResponse> getUserByName(@RequestParam(value = "name") String userName) {
         return userService.getUserByName(userName);
     }
 
     @PatchMapping("/updateUser")
+    //@PreAuthorize("hasAuthority('ADMIN','MANAGER','ASSISTANT_MANAGER','TEACHER')")
     public ResponseEntity<String> updateUser(
             @RequestBody @Valid UserRequestWithoutPassword userRequestWithoutPassword,
             HttpServletRequest request

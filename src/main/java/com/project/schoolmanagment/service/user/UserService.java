@@ -20,6 +20,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
@@ -38,6 +39,9 @@ public class UserService {
     private final PageableHelper pageableHelper;
     private final MethodHelper methodHelper;
 
+    //this should be used after security dependencies have been added
+    private final PasswordEncoder passwordEncoder;
+
     public ResponseMessage<UserResponse> saveUser(UserRequest userRequest, String userRole) {
         //handle uniqueness exceptions
         uniquePropertyValidator.checkDuplicate(
@@ -46,30 +50,32 @@ public class UserService {
                 userRequest.getPhoneNumber(),
                 userRequest.getEmail());
 
-        //Map DTO -> Entity object(domain object)
+
+        //map DTO -> Entity (domain object)
         User user = userMapper.mapUserRequestToUser(userRequest);
 
-        //get correct role from DB and set it to user
+
+        //get correct role from DB and set it to the user
         if (userRole.equalsIgnoreCase(RoleType.ADMIN.name())) {
             //we are setting a superUser that can not be deleted
             if (Objects.equals(userRequest.getUsername(), "Admin")) {
                 user.setBuiltIn(true);
             }
-            //give the role as an ADMIN to this user
+            //give the role of admin to this user
             user.setUserRole(userRoleService.getUserRole(RoleType.ADMIN));
         } else if (userRole.equalsIgnoreCase("Dean")) {
             user.setUserRole(userRoleService.getUserRole(RoleType.MANAGER));
         } else if (userRole.equalsIgnoreCase("ViceDean")) {
             user.setUserRole(userRoleService.getUserRole(RoleType.ASSISTANT_MANAGER));
         } else {
-            throw new ResourceNotFoundException(
-                    String.format(ErrorMessages.NOT_FOUND_USER_USER_ROLE_MESSAGE, userRole)
-            );
+            throw new ResourceNotFoundException(String.format(
+                    ErrorMessages.NOT_FOUND_USER_USER_ROLE_MESSAGE, userRole));
         }
-
+        //this line should be written after security
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        //******************************************************
         user.setIsAdvisor(false);
         User savedUser = userRepository.save(user);
-
         return ResponseMessage.<UserResponse>builder()
                 .message(SuccessMessages.USER_CREATE)
                 .object(userMapper.mapUserToUserResponse(savedUser))
