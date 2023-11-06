@@ -19,19 +19,18 @@ public class AuthenticationController {
 
     private final AuthenticationService authenticationService;
 
+
     @PostMapping("/login")
-    public ResponseEntity<LoginResponse> authenticateUser(@Valid @RequestBody LoginRequest request) {
+    public ResponseEntity<LoginResponse>authenticateUser(@Valid @RequestBody LoginRequest request){
         return authenticationService.authenticateUser(request);
     }
 
     @PatchMapping("/updatePassword")
     public ResponseEntity<String> updatePassword(@Valid @RequestBody PasswordUpdateRequest passwordUpdateRequest,
-                                                 HttpServletRequest request) {
-        authenticationService.updatePassword(passwordUpdateRequest, request);
-
+                                                 HttpServletRequest request){
+        authenticationService.updatePassword(passwordUpdateRequest,request);
         String response = SuccessMessages.PASSWORD_CHANGED_RESPONSE_MESSAGE;
         return ResponseEntity.ok(response);
-
     }
 
 }

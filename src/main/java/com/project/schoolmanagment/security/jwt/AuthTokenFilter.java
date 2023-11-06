@@ -40,40 +40,38 @@ public class AuthTokenFilter extends OncePerRequestFilter {
                                     FilterChain filterChain) throws ServletException, IOException {
 
         try {
-            //1. Get jwt from header
+            //1- get JWT from header
             String jwt = parseJwt(request);
-            //2. Validate jwt
-            if (jwt != null && jwtUtils.validateJwt(jwt)) {
-                //3. we need username
+            //2- validate JWT
+            if(jwt!=null && jwtUtils.validateJwt(jwt)){
+                //3- we need username
                 String username = jwtUtils.getUserNameFromJwtToken(jwt);
-                //4. check DB if we have user like that extend it to UserDetails
+                //4- check DB if we have user like that and extend it to UserDetails
                 UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-                //5. we are settşng the username info into the username attribute
-                request.setAttribute("username", username);
-                //6. we have to inform security context about the logged in user
+                //5- we are setting the username info into the username attribute
+                request.setAttribute("username",username);
+                //6- we have to inform security context about the logged in users
                 UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                        userDetails,
-                        null,
-                        userDetails.getAuthorities()
-                );
+                        userDetails,null,userDetails.getAuthorities());
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
-        } catch (UsernameNotFoundException e) {
-            LOGGER.error("Can not set user authentication!" + e.getMessage());
+        } catch (UsernameNotFoundException e){
+            LOGGER.error("Cannot set user authentication" , e);
         }
-        filterChain.doFilter(request, response);
+        filterChain.doFilter(request,response);
     }
 
-    //Examples of jwt
-    //Bearer aşkdjwadasjdklalwfahflsdasld...
+    // example of Jwt
+    //Bearer sdgsdkfsöakdmöaldmsäalmsädalsädasfghsfghsfghsfgdhsgd
 
-    private String parseJwt(HttpServletRequest request) {
+    private String parseJwt(HttpServletRequest request){
         String headerAuth = request.getHeader("Authorization");
-        if (StringUtils.hasText(headerAuth) && headerAuth.startsWith("Bearer ")) {
+        if(StringUtils.hasText(headerAuth) && headerAuth.startsWith("Bearer ")){
             return headerAuth.substring(7);
         }
-        LOGGER.error("Header does not contain JWT information");
+        LOGGER.error("Header does not contain JWT info");
         return null;
     }
+
 }

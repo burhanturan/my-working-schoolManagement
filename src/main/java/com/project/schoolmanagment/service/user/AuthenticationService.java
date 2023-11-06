@@ -30,66 +30,51 @@ import java.util.stream.Collectors;
 public class AuthenticationService {
 
     private final JwtUtils jwtUtils;
-
     private final AuthenticationManager authenticationManager;
-
     private final PasswordEncoder passwordEncoder;
-
     private final UserRepository userRepository;
 
     private final UserMapper userMapper;
+
+
 
     public ResponseEntity<LoginResponse> authenticateUser(LoginRequest loginRequest) {
         String username = loginRequest.getUsername();
         String password = loginRequest.getPassword();
 
-        //we will validate the password and username
-        Authentication authentication = authenticationManager
-                .authenticate(new UsernamePasswordAuthenticationToken(username, password));
+        //we will validate the username and password
+        Authentication authentication =
+                authenticationManager
+                        .authenticate(new UsernamePasswordAuthenticationToken(username,password));
 
         //we are uploading the user information into security context
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        String token = "Bearer " + jwtUtils.generateJwtToken(authentication);
+        String token = "Bearer " +jwtUtils.generateJwtToken(authentication);
 
-        //we are getting logged in user information
+        //we are getting logged-in user information
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
 
-        Set<String> roles = userDetails.getAuthorities()
+        //we are getting the roles of this user
+        Set<String>roles = userDetails.getAuthorities()
                 .stream()
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.toSet());
 
-        //since we have only one role, we are getting the first one
-        Optional<String> role = roles.stream().findFirst();
+        //since we have only one role, we are getting the first value
+        Optional<String>role = roles.stream().findFirst();
 
-        //another way of initializing builder.
+        //another way of initializing builder
         LoginResponse.LoginResponseBuilder loginResponseBuilder = LoginResponse.builder();
         loginResponseBuilder.username(userDetails.getUsername());
         loginResponseBuilder.token(token.substring(7));
         loginResponseBuilder.name(userDetails.getName());
         loginResponseBuilder.ssn(userDetails.getSsn());
         role.ifPresent(loginResponseBuilder::role);
-
         return ResponseEntity.ok(loginResponseBuilder.build());
-
-
     }
 
     public void updatePassword(PasswordUpdateRequest passwordUpdateRequest, HttpServletRequest request) {
-//        String userName = (String) request.getAttribute("username");
-//        User user = userRepository.findByUsername(userName);
-//
-//        if (user.getBuiltIn()) {
-//            throw new BadRequestException(ErrorMessages.NOT_PERMITTED_METHOD_MESSAGE);
-//        }
-//        if (passwordEncoder.matches(passwordUpdateRequest.getOldPassword(), user.getPassword())) {
-//            throw new BadRequestException(ErrorMessages.PASSWORD_NOT_MATCHED);
-//        }
-//
-//        user.setPassword(passwordEncoder.encode(passwordUpdateRequest.getNewPassword()));
-//        userRepository.save(user);
-
         String userName = (String) request.getAttribute("username");
         User user = userRepository.findByUsername(userName);
 

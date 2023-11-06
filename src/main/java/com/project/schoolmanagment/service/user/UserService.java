@@ -82,7 +82,6 @@ public class UserService {
                 .build();
     }
 
-
     public ResponseMessage<BaseUserResponse> getUserById(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException(String.format(ErrorMessages.NOT_FOUND_USER_MESSAGE, userId)));

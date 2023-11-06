@@ -25,31 +25,27 @@ public class AuthEntryPointJwt implements AuthenticationEntryPoint {
     private static final Logger LOGGER = LoggerFactory.getLogger(AuthEntryPointJwt.class);
 
     /**
-     * @param request       that resulted in an <code>AuthenticationException</code>
-     * @param response      so that the user agent can begin authentication
+     *
+     * @param request that resulted in an <code>AuthenticationException</code>
+     * @param response so that the user agent can begin authentication
      * @param authException that caused the invocation
      * @throws IOException
      * @throws ServletException
      */
     @Override
-    public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
-        LOGGER.error("Unauthorized error: {}", authException.getMessage());
-
-        //We are specifying the content type of the response
+    public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException {
+        LOGGER.error("Unauthorized error : {}", authException.getMessage());
+        //we are specifying the content type of the response
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-
-        //we are specifying the response status 401
+        //we are specifying the response status (401)
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-
         //we are specifying the body for our custom response in case of error
-        final Map<String, Object> body = new HashMap<>();
-        body.put("status", HttpServletResponse.SC_UNAUTHORIZED);
-        body.put("error", "Unauthorized");
-        body.put("message", authException.getMessage());
-        body.put("path", request.getServletPath());
+        final Map<String,Object>body = new HashMap<>();
+        body.put("status",HttpServletResponse.SC_UNAUTHORIZED);
+        body.put("error type","Unauthorized");
+        body.put("message",authException.getMessage());
+        body.put("path",request.getServletPath());
         final ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.writeValue(response.getOutputStream(), body);
-
-
+        objectMapper.writeValue(response.getOutputStream(),body);
     }
 }

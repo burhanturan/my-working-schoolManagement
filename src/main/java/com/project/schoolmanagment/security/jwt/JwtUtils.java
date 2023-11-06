@@ -15,24 +15,25 @@ public class JwtUtils {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JwtUtils.class);
 
-    //comes from application.properties
+
     @Value("${backendapi.app.jwtExpirationMs}")
     private long jwtExpirations;
 
-    //comes from application.properties
     @Value("${backendapi.app.jwtSecret}")
     private String jwtSecret;
 
-    public String generateJwtToken(Authentication authentication) {
+
+    public String generateJwtToken(Authentication authentication){
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
         return generateTokenFromUsername(userDetails.getUsername());
     }
 
     /**
+     *
      * @param jwtToken token to validate
      * @return true of JWT is correct otherwise will return FALSE.
      */
-    public boolean validateJwt(String jwtToken) {
+    public boolean validateJwt(String jwtToken){
         try {
             Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(jwtToken);
             return true;
@@ -50,21 +51,20 @@ public class JwtUtils {
         return false;
     }
 
-
     /**
      * @param username as String
      * @return JWT signed with algorithm and our jwtSecret key
      */
-    public String generateTokenFromUsername(String username) {
+    public String generateTokenFromUsername(String username){
         return Jwts.builder()
                 .setSubject(username)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(new Date().getTime() + jwtExpirations))
-                .signWith(SignatureAlgorithm.HS512, jwtSecret)
+                .signWith(SignatureAlgorithm.HS512,jwtSecret)
                 .compact();
     }
 
-    public String getUserNameFromJwtToken(String token) {
+    public String getUserNameFromJwtToken(String token){
         return Jwts.parser()
                 .setSigningKey(jwtSecret)
                 .parseClaimsJws(token)

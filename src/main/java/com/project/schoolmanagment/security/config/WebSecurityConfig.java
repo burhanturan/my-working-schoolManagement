@@ -28,7 +28,7 @@ public class WebSecurityConfig {
 
     private final UserDetailsServiceImpl userDetailsService;
 
-    private final AuthEntryPointJwt authEntryPointJwt;
+    private final AuthEntryPointJwt unauthorizedHandler;
 
     /**
      * main configuration class for spring security
@@ -38,7 +38,7 @@ public class WebSecurityConfig {
         http.cors().and()
                 .csrf().disable()
                 //we are specifying the exception handling for unauthorised login try
-                .exceptionHandling().authenticationEntryPoint(authEntryPointJwt)
+                .exceptionHandling().authenticationEntryPoint(unauthorizedHandler)
                 .and()
                 //we are not keeping the session info in backend.
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
@@ -52,7 +52,8 @@ public class WebSecurityConfig {
         http.headers().frameOptions().sameOrigin();
 
         //injecting the authentication provider that we will use
-        http.authenticationProvider(getDaoAuthenticationProvider());
+        http.authenticationProvider(daoAuthenticationProvider());
+
         http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
@@ -62,37 +63,40 @@ public class WebSecurityConfig {
      * this will be our authentication manager in spring security
      */
     @Bean
-    public AuthenticationManager getAuthenticationManager(AuthenticationConfiguration configuration) throws Exception {
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
         return configuration.getAuthenticationManager();
     }
 
+
     /**
-     * @return our own token filter class that exists in the jwt package
+     *
+     * @return our own token filter class that exist in jwt package
      */
     @Bean
-    public AuthTokenFilter authenticationJwtTokenFilter() {
+    public AuthTokenFilter authenticationJwtTokenFilter(){
         return new AuthTokenFilter();
     }
 
-    //we are storing encrypted password in the DB so we use this method
     @Bean
-    public PasswordEncoder passwordEncoder() {
+    public PasswordEncoder passwordEncoder(){
         return new BCryptPasswordEncoder();
     }
 
+
     @Bean
-    public DaoAuthenticationProvider getDaoAuthenticationProvider() {
+    public DaoAuthenticationProvider daoAuthenticationProvider(){
         DaoAuthenticationProvider daoAuthenticationProvider = new DaoAuthenticationProvider();
         daoAuthenticationProvider.setUserDetailsService(userDetailsService);
         daoAuthenticationProvider.setPasswordEncoder(passwordEncoder());
         return daoAuthenticationProvider;
     }
 
+
     @Bean
-    public WebMvcConfigurer corsConfigurer() {
+    public WebMvcConfigurer corsConfigurer(){
         return new WebMvcConfigurer() {
             @Override
-            public void addCorsMappings(CorsRegistry registry) {
+            public void addCorsMappings(CorsRegistry registry){
                 registry.addMapping("/**")
                         //all origins are allowed
                         .allowedOrigins("*")
@@ -111,6 +115,7 @@ public class WebSecurityConfig {
             "/v3/api-docs/**",
             "swagger-ui.html",
             "/swagger-ui/**",
+            "/user/save/*",
             "index.html",
             "/images/**",
             "/css/**",

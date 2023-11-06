@@ -26,7 +26,7 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping("/save/{userRole}")
-    //@PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<ResponseMessage<UserResponse>> saveUser(
             @RequestBody @Valid UserRequest userRequest,
             @PathVariable String userRole) {
@@ -35,13 +35,13 @@ public class UserController {
 
 
     @GetMapping("/getUserById/{userId}")
-    //@PreAuthorize("hasAuthority('ADMIN','MANAGER')")
+    @PreAuthorize("hasAuthority('ADMIN','MANAGER')")
     public ResponseMessage<BaseUserResponse> getUserById(@PathVariable Long userId) {
         return userService.getUserById(userId);
     }
 
     @GetMapping("/getAllUserByPage/{userRole}")
-   // @PreAuthorize("hasAnyAuthority('ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ADMIN')")
     public ResponseEntity<Page<UserResponse>> getPageByPage(
             @PathVariable String userRole,
             @RequestParam(value = "page", defaultValue = "0") int page,
@@ -55,13 +55,13 @@ public class UserController {
     }
 
     @GetMapping("/getUserByName")
-   // @PreAuthorize("hasAuthority('ADMIN','MANAGER','ASSISTANT_MANAGER')")
+    @PreAuthorize("hasAuthority('ADMIN','MANAGER','ASSISTANT_MANAGER')")
     public List<UserResponse> getUserByName(@RequestParam(value = "name") String userName) {
         return userService.getUserByName(userName);
     }
 
     @PatchMapping("/updateUser")
-    //@PreAuthorize("hasAuthority('ADMIN','MANAGER','ASSISTANT_MANAGER','TEACHER')")
+    @PreAuthorize("hasAuthority('ADMIN','MANAGER','ASSISTANT_MANAGER','TEACHER')")
     public ResponseEntity<String> updateUser(
             @RequestBody @Valid UserRequestWithoutPassword userRequestWithoutPassword,
             HttpServletRequest request
