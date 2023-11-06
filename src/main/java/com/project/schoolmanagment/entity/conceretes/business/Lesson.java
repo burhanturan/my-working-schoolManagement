@@ -11,8 +11,8 @@ import java.util.Set;
 
 @Entity
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 @Builder
 public class Lesson {
 
@@ -26,8 +26,8 @@ public class Lesson {
 
     private Boolean isCompulsory;
 
-    @ManyToMany(mappedBy ="lessons",cascade = CascadeType.REMOVE)
     @JsonIgnore
+    @ManyToMany(mappedBy = "lessons",cascade = CascadeType.REMOVE)
     private Set<LessonProgram> lessonPrograms;
 
 

@@ -1,24 +1,20 @@
 package com.project.schoolmanagment.entity.conceretes.business;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.project.schoolmanagment.entity.conceretes.user.User;
 import com.project.schoolmanagment.entity.enums.Day;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 import java.time.LocalTime;
-import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@Data
-@NoArgsConstructor
+@Getter
+@Setter
 @AllArgsConstructor
+@NoArgsConstructor
 @Builder
 public class LessonProgram {
 

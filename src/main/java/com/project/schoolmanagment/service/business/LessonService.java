@@ -17,7 +17,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -126,7 +128,7 @@ public class LessonService {
 
         //step 1: are you really changing the name of the lesson?
         //step 2: if the step 1 is the case, is this lesson name in DB or not
-        if (lesson.getLessonName().equals(lessonRequest.getLessonName())
+        if (!lesson.getLessonName().equals(lessonRequest.getLessonName())
                 && lessonRepository.existsByLessonNameEqualsIgnoreCase(lessonRequest.getLessonName())
         ) {
             throw new ConflictException(String.format(ErrorMessages.ALREADY_REGISTER_LESSON_MESSAGE, lessonRequest.getLessonName()));
@@ -142,5 +144,16 @@ public class LessonService {
         Lesson savedLesson = lessonRepository.save(updatedLesson);
 
         return lessonMapper.mapLessonToLessonResponse(savedLesson);
+    }
+
+
+    public ResponseMessage<LessonResponse> getLessonById(Long id) {
+        Lesson lesson = isLessonExistById(id);
+
+        return ResponseMessage.<LessonResponse>builder()
+                .message(SuccessMessages.LESSON_FOUND)
+                .object(lessonMapper.mapLessonToLessonResponse(lesson))
+                .httpStatus(HttpStatus.OK)
+                .build();
     }
 }
