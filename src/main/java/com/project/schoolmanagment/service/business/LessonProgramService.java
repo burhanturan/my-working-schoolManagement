@@ -1,6 +1,7 @@
 package com.project.schoolmanagment.service.business;
 
 import com.project.schoolmanagment.contactmessage.dto.ResponseMessage;
+import com.project.schoolmanagment.contactmessage.exception.BadRequestException;
 import com.project.schoolmanagment.entity.conceretes.business.EducationTerm;
 import com.project.schoolmanagment.entity.conceretes.business.Lesson;
 import com.project.schoolmanagment.entity.conceretes.business.LessonProgram;
@@ -116,5 +117,13 @@ public class LessonProgramService {
                 .message(SuccessMessages.LESSON_PROGRAM_DELETE)
                 .httpStatus(HttpStatus.OK)
                 .build();
+    }
+
+    public Set<LessonProgram> getLessonProgramById(Set<Long> lessonIdSet) {
+        Set<LessonProgram> lessonPrograms = lessonProgramRepository.getLessonProgramByUsersUsername(lessonIdSet);
+        if (lessonPrograms.isEmpty()) {
+            throw new BadRequestException(ErrorMessages.NOT_FOUND_LESSON_PROGRAM_MESSAGE);
+        }
+        return lessonPrograms;
     }
 }

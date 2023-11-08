@@ -82,6 +82,11 @@ public class UserService {
                 .build();
     }
 
+    /**
+     *
+     * @param userId for query
+     * @return mapped DTO BaseUserResponse
+     */
     public ResponseMessage<BaseUserResponse> getUserById(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException(String.format(ErrorMessages.NOT_FOUND_USER_MESSAGE, userId)));
@@ -124,14 +129,12 @@ public class UserService {
 
         User user = userRepository.findByUsername(userName);
 
-        //We need to check if the user can be change ??
+        //we need to check if this user can be changed
         methodHelper.isUserBuiltIn(user);
+        //we need to check are we changing the unique properties
+        uniquePropertyValidator.checkUniqueProperties(user,userRequestWithoutPassword);
 
-        //we need to check if we are changing unique properties ??
-
-        uniquePropertyValidator.checkUniqueProperties(user, userRequestWithoutPassword);
-
-        //implementations without using mapping builders
+        //implementation without using mapper builders
         user.setUsername(userRequestWithoutPassword.getUsername());
         user.setBirthDay(userRequestWithoutPassword.getBirthDay());
         user.setEmail(userRequestWithoutPassword.getEmail());
@@ -142,9 +145,7 @@ public class UserService {
         user.setSurname(userRequestWithoutPassword.getSurname());
         user.setSsn(userRequestWithoutPassword.getSsn());
         userRepository.save(user);
-
         String message = SuccessMessages.USER_UPDATE;
-
-        return new ResponseEntity<>(message, HttpStatus.OK);
+        return  ResponseEntity.ok(message);
     }
 }

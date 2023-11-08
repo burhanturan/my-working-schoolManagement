@@ -44,8 +44,8 @@ public class LessonProgramController {
         return lessonProgramService.getLessonProgramByPage(page, size, sort, type);
     }
 
-    @GetMapping("/getLessonProgramById/{id}")
-    @PreAuthorize("hasAnyAuthority('ADMIN','MANAGER','ASSISTANT_MANAGER','TEACHER','STUDENT')")
+    @GetMapping("/getById/{id}")
+    @PreAuthorize("hasAnyAuthority('ADMIN','MANAGER','ASSISTANT_MANAGER')")
     public LessonProgramResponse getLessonProgramById(@PathVariable Long id){
         return lessonProgramService.getLessonProgramById(id);
     }
