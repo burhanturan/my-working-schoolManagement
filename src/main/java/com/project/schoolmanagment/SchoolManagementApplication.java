@@ -88,7 +88,13 @@ public class SchoolManagementApplication implements CommandLineRunner {
     }
 }
 
-
+/*
+admin login
+{
+    "username": "Admin19",
+    "password": "Ankara06*"
+}
+ */
 
 
 

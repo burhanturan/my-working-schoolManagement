@@ -26,17 +26,25 @@ public class MethodHelper {
                 .orElseThrow(() -> new ResourceNotFoundException(String.format(ErrorMessages.NOT_FOUND_USER_MESSAGE, userId)));
     }
 
-    public void checkRole(User user, RoleType roleType){
-        if(!user.getUserRole().getRoleType().equals(roleType)){
+    public void checkRole(User user, RoleType roleType) {
+        if (!user.getUserRole().getRoleType().equals(roleType)) {
             throw new ResourceNotFoundException(
-                    String.format(ErrorMessages.NOT_FOUND_USER_USER_ROLE_MESSAGE,user.getId(),roleType));
+                    String.format(ErrorMessages.NOT_FOUND_USER_USER_ROLE_MESSAGE, user.getId(), roleType));
         }
     }
 
     public void checkAdvisor(User user) {
         if (Boolean.FALSE.equals(user.getIsAdvisor())) {
-            throw new ResourceNotFoundException(String.format(ErrorMessages.NOT_FOUND_ADVISOR_MESSAGE,user.getId()));
+            throw new ResourceNotFoundException(String.format(ErrorMessages.NOT_FOUND_ADVISOR_MESSAGE, user.getId()));
         }
+    }
+
+    public User isUserExistByUsername(String username) {
+        User user = userRepository.findByUsername(username);
+        if (user == null) {
+            throw new ResourceNotFoundException(String.format(ErrorMessages.NOT_FOUND_USERNAME_MESSAGE, username));
+        }
+        return user;
     }
 
 

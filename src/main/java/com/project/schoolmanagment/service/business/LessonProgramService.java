@@ -105,7 +105,9 @@ public class LessonProgramService {
     }
 
     public List<LessonProgramResponse> getAllAssigned() {
-        return lessonProgramRepository.findByUsers_IdNotNull().stream()
+        return lessonProgramRepository.findByUsers_IdNotNull()
+                .stream()
+                .distinct()
                 .map(lessonProgramMapper::mapLessonProgramToLessonProgramResponse)
                 .collect(Collectors.toList());
     }
@@ -126,4 +128,5 @@ public class LessonProgramService {
         }
         return lessonPrograms;
     }
+
 }

@@ -104,7 +104,7 @@ public class LessonService {
     }
 
 
-    public Page<LessonResponse> getLEssonByPage(int page, int size, String sort, String type) {
+    public Page<LessonResponse> getLessonByPage(int page, int size, String sort, String type) {
 
         Pageable pageableWithProperties = pageableHelper.getPageableWithProperties(page, size, sort, type);
         return lessonRepository.findAll(pageableWithProperties)
