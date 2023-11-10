@@ -46,11 +46,9 @@ public class StudentInfo {
     private User student;
 
     @ManyToOne
-    @JsonIgnore
     private Lesson lesson;
 
     @OneToOne
-    @JsonIgnore
     private EducationTerm educationTerm;
 
 

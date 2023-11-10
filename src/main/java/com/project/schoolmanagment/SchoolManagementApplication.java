@@ -7,7 +7,6 @@ import com.project.schoolmanagment.entity.enums.RoleType;
 import com.project.schoolmanagment.repository.user.UserRepository;
 import com.project.schoolmanagment.repository.user.UserRoleRepository;
 import com.project.schoolmanagment.service.user.UserRoleService;
-import com.project.schoolmanagment.service.user.UserService;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

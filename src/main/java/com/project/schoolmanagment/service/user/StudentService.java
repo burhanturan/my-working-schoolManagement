@@ -206,19 +206,19 @@ public class StudentService {
     }
 
     public List<StudentResponse> getAllStudentByUsernameContains(String username) {
-        List<User> savedStudents = new ArrayList<>();
-        List<User> users = userRepository.findAllByUsernameContainsIgnoreCase(username);
+        //List<User> savedStudents = new ArrayList<>();
+        List<User> users = userRepository.findAllByUsernameAndRoleType(username);
 
-        for (User user : users) {
-            if (user.getUserRole().getRoleType().equals(RoleType.STUDENT)) {
-                savedStudents.add(user);
-            }
-        }
-        if (savedStudents.isEmpty()) {
+//        for (User user : users) {
+//            if (user.getUserRole().getRoleType().equals(RoleType.STUDENT)) {
+//                savedStudents.add(user);
+//            }
+//        }
+        if (users.isEmpty()) {
             throw new ResourceNotFoundException(String.format(ErrorMessages.NOT_FOUND_USERNAME_MESSAGE, username));
         }
 
-        return savedStudents.stream()
+        return users.stream()
                 .map(userMapper::mapUserToStudentResponse)
                 .collect(Collectors.toList());
 

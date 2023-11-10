@@ -39,5 +39,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Query(value = "SELECT MAX(u.studentNumber) FROM User u")
     int getMaxStudentNumber();
 
-    List<User> findAllByUsernameContainsIgnoreCase(String userName);
+    @Query("SELECT u FROM User u WHERE LOWER(u.username) LIKE LOWER(CONCAT('%', :username, '%')) AND u.userRole.roleType = 'STUDENT'")
+    List<User> findAllByUsernameAndRoleType(String username);
+
 }

@@ -5,13 +5,9 @@ import com.project.schoolmanagment.payload.request.user.ChooseLessonProgramWithI
 import com.project.schoolmanagment.payload.request.user.StudentRequest;
 import com.project.schoolmanagment.payload.request.user.StudentRequestWithoutPassword;
 import com.project.schoolmanagment.payload.response.user.StudentResponse;
-import com.project.schoolmanagment.payload.response.user.UserResponse;
-import com.project.schoolmanagment.service.helper.PageableHelper;
 import com.project.schoolmanagment.service.user.StudentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -93,7 +89,6 @@ public class StudentController {
             @RequestParam String username
     ) {
         return ResponseEntity.ok(studentService.getAllStudentByUsernameContains(username));
-
     }
 
 
