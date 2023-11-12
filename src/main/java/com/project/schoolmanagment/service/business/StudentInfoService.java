@@ -13,6 +13,7 @@ import com.project.schoolmanagment.payload.mappers.StudentInfoMapper;
 import com.project.schoolmanagment.payload.messages.ErrorMessages;
 import com.project.schoolmanagment.payload.messages.SuccessMessages;
 import com.project.schoolmanagment.payload.request.business.StudentInfoRequest;
+import com.project.schoolmanagment.payload.request.business.UpdateStudentInfoRequest;
 import com.project.schoolmanagment.payload.response.business.StudentInfoResponse;
 import com.project.schoolmanagment.repository.business.StudentInfoRepository;
 import com.project.schoolmanagment.service.helper.MethodHelper;
@@ -25,6 +26,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -141,6 +144,7 @@ public class StudentInfoService {
                 .build();
     }
 
+    //Practicing purposes
     public StudentInfo isStudentInfoExists(Long id) {
         boolean isExists = studentInfoRepository.existsByIdEquals(id);
         if (!isExists) {
@@ -154,5 +158,79 @@ public class StudentInfoService {
         Pageable pageable = pageableHelper.getPageableWithProperties(page, size, sort, type);
         return studentInfoRepository.findAll(pageable)
                 .map(studentInfoMapper::mapStudentInfoToStudentInfoResponse);
+    }
+
+    public ResponseMessage<StudentInfoResponse> update(UpdateStudentInfoRequest studentInfoRequest, Long studentInfoId) {
+        //validate studentInfo is exists or not
+        StudentInfo studentInfo = isStudentInfoExists(studentInfoId);
+
+        //get lesson from update request DTO
+        Lesson lesson = lessonService.isLessonExistById(studentInfoRequest.getLessonId());
+
+        //get educationTerm from update request DTO
+        EducationTerm educationTerm = educationTermService.isEducationTermExist(studentInfoRequest.getEducationTermId());
+
+        Double averageNote = calculateAverageNote(studentInfoRequest.getMidtermExam(), studentInfoRequest.getFinalExam());
+
+        Note note = checkLetterGrade(averageNote);
+
+        //map DTO to domain object
+        StudentInfo updatedStudentInfo = studentInfoMapper
+                .mapUpdateStudentInfoRequestToStudentInfo(
+                        studentInfoRequest,
+                        studentInfoId,
+                        lesson,
+                        educationTerm,
+                        note,
+                        averageNote);
+
+        //set missing properties
+        updatedStudentInfo.setStudent(studentInfo.getStudent());
+        updatedStudentInfo.setTeacher(studentInfo.getTeacher());
+
+        StudentInfo savedStudentInfo = studentInfoRepository.save(updatedStudentInfo);
+
+        return ResponseMessage.<StudentInfoResponse>builder()
+                .message(SuccessMessages.STUDENT_INFO_UPDATE)
+                .object(studentInfoMapper.mapStudentInfoToStudentInfoResponse(savedStudentInfo))
+                .httpStatus(HttpStatus.OK)
+                .build();
+    }
+
+    public Page<StudentInfoResponse> getAllForTeacher(HttpServletRequest request, int page, int size) {
+
+        Pageable pageable = pageableHelper.getPageableWithProperties(page, size);
+        String username = (String) request.getAttribute("username");
+        User teacher = methodHelper.isUserExistByUsername(username);
+        return studentInfoRepository.findByTeacherUsername(username, pageable)
+                .map(studentInfoMapper::mapStudentInfoToStudentInfoResponse);
+    }
+
+    public Page<StudentInfoResponse> getAllForStudent(HttpServletRequest request, int page, int size) {
+
+        Pageable pageable = pageableHelper.getPageableWithProperties(page, size);
+        String username = (String) request.getAttribute("username");
+        User teacher = methodHelper.isUserExistByUsername(username);
+        return studentInfoRepository.findByStudentUsername(username, pageable)
+                .map(studentInfoMapper::mapStudentInfoToStudentInfoResponse);
+    }
+
+    public List<StudentInfoResponse> getStudentInfoByStudentId(Long studentId) {
+        //Validate is exists
+        User student = methodHelper.isUserExist(studentId);
+        //Validate is really student
+        methodHelper.checkRole(student, RoleType.STUDENT);
+
+        if (!studentInfoRepository.existsByStudentId(studentId)) {
+            throw new ResourceNotFoundException(
+                    String.format(ErrorMessages.STUDENT_INFO_NOT_FOUND_BY_STUDENT_ID, studentId));
+        }
+        return studentInfoRepository.getAllByStudentId_Id(studentId).stream()
+                .map(studentInfoMapper::mapStudentInfoToStudentInfoResponse)
+                .collect(Collectors.toList());
+    }
+
+    public StudentInfoResponse findById(Long id) {
+        return studentInfoMapper.mapStudentInfoToStudentInfoResponse(isStudentInfoExists(id));
     }
 }
