@@ -42,4 +42,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Query("SELECT u FROM User u WHERE LOWER(u.username) LIKE LOWER(CONCAT('%', :username, '%')) AND u.userRole.roleType = 'STUDENT'")
     List<User> findAllByUsernameAndRoleType(String username);
 
+    //to find the users by given id array
+    @Query("SELECT u FROM User u WHERE u.id IN :userIds")
+    List<User> findUsersByIdArray(Long[] userIds);
+
 }

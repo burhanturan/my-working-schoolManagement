@@ -43,9 +43,7 @@ public class Meet {
             joinColumns = @JoinColumn(name = "meet_id"),
             inverseJoinColumns = @JoinColumn(name = "student_id")
     )
-    private List<User>studentList;
-
-
+    private List<User> studentList;
 
 
 }

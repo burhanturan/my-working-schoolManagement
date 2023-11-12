@@ -148,4 +148,9 @@ public class UserService {
         String message = SuccessMessages.USER_UPDATE;
         return  ResponseEntity.ok(message);
     }
+
+    public List<User> findUsersByIdArray(Long[] id){
+        return userRepository.findUsersByIdArray(id);
+    }
+
 }
