@@ -5,14 +5,14 @@ import com.project.schoolmanagment.payload.request.business.MeetingRequest;
 import com.project.schoolmanagment.payload.response.business.MeetingResponse;
 import com.project.schoolmanagment.service.business.MeetingService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import java.util.List;
 
 @RestController
 @RequestMapping("/meet")
@@ -27,6 +27,67 @@ public class MeetingController {
             HttpServletRequest request,
             @RequestBody @Valid MeetingRequest meetingRequest) {
         return meetingService.saveMeeting(request, meetingRequest);
+    }
+
+    @GetMapping("/getAll")
+    @PreAuthorize("hasAnyAuthority('ADMIN')")
+    public List<MeetingResponse> getALl() {
+        return meetingService.getALl();
+    }
+
+    @GetMapping("/getMeetById/{id}")
+    @PreAuthorize("hasAnyAuthority('ADMIN')")
+    public ResponseMessage<MeetingResponse> getMeetingById(@PathVariable Long id) {
+        return meetingService.getMeetingById(id);
+    }
+
+    @DeleteMapping("/delete/{id}")
+    @PreAuthorize("hasAnyAuthority('ADMIN','TEACHER')")
+    public ResponseMessage deleteById(@PathVariable Long id) {
+        return meetingService.deleteById(id);
+    }
+
+    @PutMapping("/update/{meetingId}")
+    @PreAuthorize("hasAnyAuthority('ADMIN','TEACHER')")
+    public ResponseMessage<MeetingResponse> updateMeeting(
+            @RequestBody @Valid MeetingRequest meetingRequest,
+            @PathVariable Long meetingId,
+            HttpServletRequest request
+    ) {
+        return meetingService.updateMeeting(meetingId, meetingRequest, request);
+    }
+
+    @GetMapping("/getAllMeetByAdvisorTeacher")
+    @PreAuthorize("hasAnyAuthority('TEACHER')")
+    public ResponseEntity<List<MeetingResponse>> getAllMeetByTeachers(HttpServletRequest request) {
+        return meetingService.getAllMeetByTeachers(request);
+
+    }
+
+    @GetMapping("/getAllMeetByStudent")
+    @PreAuthorize("hasAnyAuthority('STUDENT')")
+    public ResponseEntity<List<MeetingResponse>> getAllMeetByStudents(HttpServletRequest request) {
+        return meetingService.getAllMeetByStudents(request);
+
+    }
+
+    @GetMapping("/getAllMeetByPage")
+    @PreAuthorize("hasAnyAuthority('ADMIN')")
+    public Page<MeetingResponse> getAllMeetByPage(
+            @RequestParam(value = "page") int page,
+            @RequestParam(value = "size") int size
+    ) {
+        return meetingService.getAllMeetByPage(page, size);
+    }
+
+    @GetMapping("/getAllMeetByAdvisorAsPage")
+    @PreAuthorize("hasAnyAuthority('TEACHER')")
+    public ResponseEntity<Page<MeetingResponse>> getAllMeetByAdvisorAsPage(
+            HttpServletRequest request,
+            @RequestParam(value = "page") int page,
+            @RequestParam(value = "size") int size
+    ) {
+        return meetingService.getAllMeetByAdvisorAsPage(request, page, size);
     }
 
 
