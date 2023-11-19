@@ -46,4 +46,10 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Query("SELECT u FROM User u WHERE u.id IN :userIds")
     List<User> findUsersByIdArray(Long[] userIds);
 
+    @Query("SELECT u FROM User u WHERE u.id = ?1 AND u.userRole.roleType = 'STUDENT'")
+    User findByIdAndRoleType(Long id);
+
+    @Query("SELECT u FROM User u WHERE u.isActive =?1")
+    List<User>findAllByIsActive(boolean isActive);
+
 }

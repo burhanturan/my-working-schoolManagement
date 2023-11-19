@@ -27,7 +27,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -209,11 +208,6 @@ public class StudentService {
         //List<User> savedStudents = new ArrayList<>();
         List<User> users = userRepository.findAllByUsernameAndRoleType(username);
 
-//        for (User user : users) {
-//            if (user.getUserRole().getRoleType().equals(RoleType.STUDENT)) {
-//                savedStudents.add(user);
-//            }
-//        }
         if (users.isEmpty()) {
             throw new ResourceNotFoundException(String.format(ErrorMessages.NOT_FOUND_USERNAME_MESSAGE, username));
         }
@@ -221,6 +215,23 @@ public class StudentService {
         return users.stream()
                 .map(userMapper::mapUserToStudentResponse)
                 .collect(Collectors.toList());
+    }
+
+    public com.project.schoolmanagment.payload.response.abstracts.ResponseMessage<StudentResponse> getStudentById(Long id) {
+        User student = methodHelper.isUserExist(id);
+        User existStudent = userRepository.findByIdAndRoleType(id);
+        return com.project.schoolmanagment.payload.response.abstracts.ResponseMessage.<StudentResponse>builder()
+                .object(userMapper.mapUserToStudentResponse(existStudent))
+                .message(SuccessMessages.STUDENT_FOUND)
+                .build();
 
     }
+
+    public List<StudentResponse> getAllStudentByList(boolean isActive) {
+        List<User> users = userRepository.findAllByIsActive(isActive);
+        return users.stream()
+                .map(userMapper::mapUserToStudentResponse)
+                .collect(Collectors.toList());
+    }
+
 }

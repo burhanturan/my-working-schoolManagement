@@ -259,9 +259,7 @@ public class MeetingService {
                         (meetingRepository.findByAdvisoryTeacher_IdEquals(advisorTeacher.getId(), pageable)
                                 .map(meetingMapper::mapMeetToMeetingResponse))
                 );
-
     }
-
 
 
 }

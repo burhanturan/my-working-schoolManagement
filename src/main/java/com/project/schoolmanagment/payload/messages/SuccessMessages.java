@@ -36,6 +36,7 @@ public class SuccessMessages {
     //Student
     public static final String STUDENT_SAVE = "Student is Saved";
     public static final String STUDENT_UPDATE = "Student is Updated Successfully";
+    public static final String STUDENT_FOUND = "Student is found";
 
     //Teacher
     public static final String TEACHER_SAVE = "Teacher is Saved";
